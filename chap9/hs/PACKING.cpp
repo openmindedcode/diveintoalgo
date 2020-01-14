@@ -8,9 +8,10 @@
 using namespace std;
 
 int total, capacity;         // total: 총 물건 갯수(최대 100), capacity: 캐리어 용량(최대 1000)
-string name[21];             // name: 상품 이름(최대 20글자)
+string name[100];            // name: 상품 이름
 int volume[100], need[100];  // volume: 상품 부피(최대 1000), need: 상품의 절박도(최대 1000)
 int cache[1001][100];        // 캐리어 무게에 따른 각 아이템 별로 절박도를 저장하는 캐시
+                             // 참고. 입력받을 캐리어 용량 크기만큼만 할당해도 좋을 것 같음.
 
 // 완전 탐색: 지금까지 고른 물건 목록(items)을 주면 남은 용량으로 채울 수 있는 최대 절박도 합 리턴
 // int pack(vector<> items)
@@ -31,9 +32,7 @@ int pack(int capacity, int item)
 
     // item 선택한 경우
     if(capacity >= volume[item])
-    {
         ret = max(ret, pack(capacity - volume[item], item+1) + need[item]);
-    }
 
     return ret;
 }
@@ -44,7 +43,7 @@ void reconstruct(int capacity, int item, vector<string>& picked)
     if(item == total) return;
 
     // item을 선택하지 않았다는 소리임
-    if(pack(capacity, item) == pack(capacity, item+1))
+    if(pack(capacity, item) == pack(capacity, item+1)) // ** 부피나 절박도가 동일한 경우에 대해서 해결 불가!!!
     {
         reconstruct(capacity, item+1, picked);
     }
@@ -59,7 +58,6 @@ int main(void)
 {
     int testCase;
     cin >> testCase;
-    cout << "[DEBUG] testcase : " << testCase << endl;
 
     if(testCase < 1 || testCase > 50)
         exit(-1);
@@ -69,15 +67,12 @@ int main(void)
         vector<string> picked;
         cin >> total >> capacity;
 
-        cout << "[DEBUG] total : " << total << " capacity : " << capacity << endl;
-
         if (total < 1 || total > 100 || capacity < 1 || capacity > 1000)
             exit(-1);
 
         for(int j=0; j<total; j++)
         {
             cin >> name[j] >> volume[j] >> need[j];
-            cout << "[DEBUG][" << j << "] name : " << name[j] << " / volume : " << volume[j] << " / need : " << need[j] << endl;
             if(name[j].empty() || name[j].size()>21 || volume[j]<1 || volume[j]>1000 || need[j]<1 || need[j]>1000)
                 exit(-1);
         }
