@@ -12,8 +12,7 @@ using Item = struct {
 
 int cache[1001][100];
 
-int pack(int capacity, int current_item, int n_item, int total_capacity,
-    Item items[]) {
+int pack(int capacity, int current_item, int n_item, Item items[]) {
   if (current_item == n_item)
     return 0;
 
@@ -21,26 +20,26 @@ int pack(int capacity, int current_item, int n_item, int total_capacity,
   if (ret != -1)
     return ret;
 
-  ret = pack(capacity, current_item + 1, n_item, total_capacity, items);
+  ret = pack(capacity, current_item + 1, n_item, items);
   if (capacity >= items[current_item].volume)
     ret = std::max(ret, pack(capacity - items[current_item].volume,
-          current_item + 1, n_item, total_capacity, items)
+          current_item + 1, n_item, items)
               + items[current_item].desire);
   return ret;
 }
 
 void reconstruct(int capacity, int current_item, std::vector<Item>& picked,
-    int n_item, int total_capacity, Item items[]) {
+    int n_item, Item items[]) {
   if (current_item == n_item)
     return;
 
-  if (pack(capacity, current_item, n_item, total_capacity, items)
-      == pack(capacity, current_item+1, n_item, total_capacity, items)) {
-    reconstruct(capacity, current_item+1, picked, n_item, total_capacity, items);
+  if (pack(capacity, current_item, n_item, items)
+      == pack(capacity, current_item+1, n_item, items)) {
+    reconstruct(capacity, current_item+1, picked, n_item, items);
   } else {
     picked.push_back(items[current_item]);
     reconstruct(capacity - items[current_item].volume, current_item + 1,
-        picked, n_item, total_capacity, items);
+        picked, n_item, items);
   }
 }
 
@@ -56,10 +55,10 @@ int main() {
     // skip the next newline
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    // reset cache
+    // reset cache and items
     std::memset(cache, -1, sizeof(cache));
 
-    Item items[n_item];
+    Item items[100];
 
     for (int j = 0; j < n_item; ++j) {
       std::string line;
@@ -76,14 +75,14 @@ int main() {
     }
 
     std::vector<Item> picked;
-    reconstruct(0, 0, picked, n_item, total_capacity, items);
+    reconstruct(total_capacity, 0, picked, n_item, items);
 
     // print result
     int result_desire = 0;
-    for (const auto & i : picked) {
+    for (const auto& i : picked) {
       result_desire += i.desire;
     }
-    std::cout << picked.size() << " " << result_desire << std::endl;
+    std::cout << result_desire << " " << picked.size() << std::endl;
     for (const auto& i : picked) {
       std::cout << i.name << std::endl;
     }
