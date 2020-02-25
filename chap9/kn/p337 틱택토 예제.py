@@ -10,7 +10,7 @@ def isFinished(board, turn):
         return True
     return False;
 
-def bijection(board):
+def bijection(board): #3^9 개의 경우의 수가 있을 수 있음. 각 경우에 해당하는 cache index를 반환
     ret = 0
     for y in range(0, 3):
         for x in range(0, 3):
@@ -23,7 +23,7 @@ def bijection(board):
     return ret
 
 def canWin(board, turn):
-    if isFinished(board, chr(ord('o') + ord('x') - ord(turn))):
+    if isFinished(board, chr(ord('o') + ord('x') - ord(turn))): # 상대turn 이 이긴 경우, 내가 졌으므로 -1 리턴
         return -1
     
     ret = cache[bijection(board)]
