@@ -1,33 +1,20 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <queue>
 
-int calculateLoopCount(std::vector<int> &vec) {
-  // sort descending order
-  std::sort(vec.begin(), vec.end(), [](const int a, const int b) {
-    return a > b;
-      });
+using PriorityQueue = std::priority_queue<int, std::vector<int>, std::greater<int>>;
 
+int calculateLoopCount(PriorityQueue &queue) {
   int count = 0;
-  while (vec.size() > 1) {
-    // pop minimum two numbers and join them
-    int num = vec.back();
-    vec.pop_back();
-    num += vec.back();
-    vec.pop_back();
+  while (queue.size() > 1) {
+    int num = queue.top();
+    queue.pop();
+    num += queue.top();
+    queue.pop();
     count += num;
 
-    // push to the joined number keeping descending order
-    bool isPushed = false;
-    for (auto it = vec.begin(); it != vec.end(); it++) {
-      if (num > *it) {
-        vec.insert(it, num);
-        isPushed = true;
-        break;
-      }
-    }
-    if (!isPushed)
-      vec.push_back(num);
+    queue.push(num);
   }
   return count;
 }
@@ -39,13 +26,13 @@ int main() {
     int n_input = 0;
     std::cin >> n_input;
 
-    std::vector<int> vec;
+    PriorityQueue queue;
     for (int i = 0; i < n_input; ++i) {
       int input = 0;
       std::cin >> input;
-      vec.push_back(input);
+      queue.push(input);
     }
-    std::cout << calculateLoopCount(vec) << std::endl;
+    std::cout << calculateLoopCount(queue) << std::endl;
   }
   return 0;
 }
